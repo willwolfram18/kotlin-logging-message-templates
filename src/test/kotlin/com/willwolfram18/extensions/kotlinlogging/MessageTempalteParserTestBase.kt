@@ -5,10 +5,14 @@ import io.kotest.matchers.collections.shouldNotContainAnyOf
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldHaveSize
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlin.time.toDuration
 
 abstract class MessageTempalteParserTestBase {
     abstract val parser: MessageTemplateParser
@@ -69,6 +73,7 @@ abstract class MessageTempalteParserTestBase {
     }
 
     @ParameterizedTest
+    @Tag("long-running")
     @ValueSource(
         ints = [
             1,
@@ -78,7 +83,9 @@ abstract class MessageTempalteParserTestBase {
             // Probably unrealistic scenarios but worth trying it out to see
             100,
             1000,
-            10000
+            10_000,
+            // Definitely unrealistic
+            1_000_000
         ]
     )
     fun performanceBenchmark(argumentCount: Int) {
@@ -90,16 +97,25 @@ abstract class MessageTempalteParserTestBase {
         // Arrange: the values
         val values = (1..argumentCount).toList()
 
-        // Arrange: timer
-        val timer = TimeSource.Monotonic.markNow()
+        // Run in a loop to
+        val durations = mutableListOf<Long>()
+        val iterations = 100
+        repeat(iterations) {
+            // Arrange: timer
+            val timer = TimeSource.Monotonic.markNow()
 
-        // Act
-        val result = parser.parseTemplateArguments(messageTemplate, *values.toTypedArray())
-        val elapsed = timer.elapsedNow()
+            // Act
+            val result = parser.parseTemplateArguments(messageTemplate, *values.toTypedArray())
+            durations.add(timer.elapsedNow().inWholeNanoseconds)
 
-        println("Execution with $argumentCount took $elapsed")
+            // Assert
+            result shouldHaveSize argumentCount
+        }
 
-        // Assert
-        result shouldHaveSize argumentCount
+        val avgDuration = (durations.sum() / durations.size).toDuration(DurationUnit.NANOSECONDS)
+        val maxDuration = durations.max().toDuration(DurationUnit.NANOSECONDS)
+        val minDuration = durations.min().toDuration(DurationUnit.NANOSECONDS)
+
+        println("Over $iterations iterations, min duration=$minDuration, max duration=$maxDuration, avg duration=$avgDuration")
     }
 }
