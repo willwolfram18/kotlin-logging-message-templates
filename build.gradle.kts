@@ -19,6 +19,9 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:6.0.5")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+    testImplementation("org.slf4j:slf4j-simple:2.0.3")
 }
 
 kotlin {
@@ -27,4 +30,5 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+    jvmArgs = jvmArgs + "-Dnet.bytebuddy.experimental=true"
 }
