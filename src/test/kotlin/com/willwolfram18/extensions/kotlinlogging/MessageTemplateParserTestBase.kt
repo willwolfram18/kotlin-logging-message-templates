@@ -1,5 +1,6 @@
 package com.willwolfram18.extensions.kotlinlogging
 
+import com.fasterxml.jackson.annotation.*
 import io.kotest.matchers.*
 import io.kotest.matchers.collections.*
 import io.kotest.matchers.maps.*
@@ -10,6 +11,18 @@ import kotlin.time.*
 
 abstract class MessageTemplateParserTestBase {
     abstract val parser: MessageTemplateParser
+
+    data class TestDataClass(
+        @field:JsonProperty("custom_field")
+        val myProperty: String,
+        val normalField: Int
+    )
+
+    class TestNormalClass(
+        @field:JsonProperty("renamed_prop")
+        val someProp: String,
+        val anotherProp: Double
+    )
 
     @Test
     fun `GIVEN no named properties in template WHEN parsing THEN empty map is returned`() {
@@ -230,5 +243,112 @@ abstract class MessageTemplateParserTestBase {
         // Assert
         result shouldHaveSize 1
         result shouldContain ("data" to "{1=hello, 2=world}")
+    }
+
+    @Test
+    fun `GIVEN destructure formatter with data class WHEN parsing THEN value is converted to map with JSON property names`() {
+        // Arrange
+        val obj = TestDataClass("test_value", 123)
+        val template = "Object is {@obj}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, obj)
+
+        // Assert
+        result shouldHaveSize 1
+        val objProperty = result["obj"]
+        require(objProperty is Map<*, *>) { "Expected Map" }
+        val objectMap = objProperty as Map<String, Any?>
+        objectMap shouldContain ("custom_field" to "test_value")
+        objectMap shouldContain ("normalField" to 123)
+    }
+
+    @Test
+    fun `GIVEN destructure formatter with normal class WHEN parsing THEN value is converted to map with JSON property names`() {
+        // Arrange
+        val obj = TestNormalClass("some_value", 45.67)
+        val template = "Normal object is {@normalObj}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, obj)
+
+        // Assert
+        result shouldHaveSize 1
+        val objProperty = result["normalObj"]
+        require(objProperty is Map<*, *>) { "Expected Map" }
+        val objectMap = objProperty as Map<String, Any?>
+        objectMap shouldContain ("renamed_prop" to "some_value")
+        objectMap shouldContain ("anotherProp" to 45.67)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `GIVEN destructure formatter with scalar values WHEN parsing THEN values are preserved unchanged`(flag: Boolean) {
+        // Arrange
+        val template = "String {@str}, int {@num}, bool {@flag}, float {@pi}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, "hello", 42, flag, 3.14)
+
+        // Assert
+        result shouldHaveSize 4
+        result shouldContain ("str" to "hello")
+        result shouldContain ("num" to 42)
+        result shouldContain ("flag" to flag)
+        result shouldContain ("pi" to 3.14)
+    }
+
+    @Test
+    fun `GIVEN destructure formatter with integer iterables WHEN parsing THEN values are converted to lists`() {
+        // Arrange
+        val list = listOf(1, 2, 3)
+        val array = arrayOf(4, 5, 6)
+        val seq = sequenceOf(7, 8, 9)
+        val template = "List {@list}, array {@array}, seq {@seq}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, list, array, seq)
+
+        // Assert
+        result shouldHaveSize 3
+
+        val listValue = result["list"]
+        require(listValue is List<*>) { "Expected List" }
+        listValue shouldContainExactly listOf<Any?>(1, 2, 3)
+
+        val arrayValue = result["array"]
+        require(arrayValue is List<*>) { "Expected List" }
+        arrayValue shouldContainExactly listOf<Any?>(4, 5, 6)
+
+        val seqValue = result["seq"]
+        require(seqValue is List<*>) { "Expected List" }
+        seqValue shouldContainExactly listOf<Any?>(7, 8, 9)
+    }
+
+    @Test
+    fun `GIVEN destructure formatter with mixed iterables WHEN parsing THEN values are converted to lists`() {
+        // Arrange
+        val list = listOf("foo", 1)
+        val array = arrayOf<Any>(2, "bar")
+        val seq = sequenceOf("baz", 3)
+        val template = "Mixed list {@list}, mixed array {@array}, mixed seq {@seq}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, list, array, seq)
+
+        // Assert
+        result shouldHaveSize 3
+
+        val listValue = result["list"]
+        require(listValue is List<*>) { "Expected List" }
+        listValue shouldContainExactly listOf<Any?>("foo", 1)
+
+        val arrayValue = result["array"]
+        require(arrayValue is List<*>) { "Expected List" }
+        arrayValue shouldContainExactly listOf(2, "bar")
+
+        val seqValue = result["seq"]
+        require(seqValue is List<*>) { "Expected List" }
+        seqValue shouldContainExactly listOf("baz", 3)
     }
 }
