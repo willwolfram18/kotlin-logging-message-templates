@@ -24,6 +24,15 @@ abstract class MessageTemplateParserTestBase {
         val anotherProp: Double
     )
 
+    data class OuterClass(
+        val name: String,
+        val inner: InnerClass
+    )
+
+    data class InnerClass(
+        val value: Int
+    )
+
     @Test
     fun `GIVEN no named properties in template WHEN parsing THEN empty map is returned`() {
         // Arrange
@@ -350,5 +359,29 @@ abstract class MessageTemplateParserTestBase {
         val seqValue = result["seq"]
         require(seqValue is List<*>) { "Expected List" }
         seqValue shouldContainExactly listOf("baz", 3)
+    }
+
+    @Test
+    fun `GIVEN destructure formatter with nested class WHEN parsing THEN nested values are converted to maps`() {
+        // Arrange
+        val obj = OuterClass("outer_value", InnerClass(99))
+        val template = "Outer object is {@outerObj}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, obj)
+
+        // Assert
+        result shouldHaveSize 1
+        val objProperty = result["outerObj"]
+        require(objProperty is Map<*, *>) { "Expected Map" }
+        @Suppress("UNCHECKED_CAST")
+        val objectMap = objProperty as Map<String, Any?>
+        objectMap shouldContain ("name" to "outer_value")
+
+        val innerProperty = objectMap["inner"]
+        require(innerProperty is Map<*, *>) { "Expected Map" }
+        @Suppress("UNCHECKED_CAST")
+        val innerMap = innerProperty as Map<String, Any?>
+        innerMap shouldContain ("value" to 99)
     }
 }
