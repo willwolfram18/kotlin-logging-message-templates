@@ -2,7 +2,7 @@ package com.willwolfram18.extensions.kotlinlogging
 
 class RegexMessageTemplateParser : MessageTemplateParser {
     companion object {
-        private val fieldNameRegex = """\{(?<name>[a-zA-Z0-9]+)}""".toRegex()
+        private val fieldNameRegex = """\{(\$?)(?<name>[a-zA-Z0-9]+)}""".toRegex()
     }
 
     override fun parseTemplateArguments(
@@ -13,9 +13,11 @@ class RegexMessageTemplateParser : MessageTemplateParser {
         val namedArgumentPairs = namedArgumentMatches.zip(args.asSequence())
 
         return buildMap {
-            for ((name, value) in namedArgumentPairs) {
-                // Group values matches "{name}" first, THEN "name"
-                put(name.groupValues[1], value)
+            for ((match, value) in namedArgumentPairs) {
+                val isStringify = match.groupValues[1] == "$"
+                val name = match.groupValues[2]
+                val finalValue = if (isStringify) value?.toString() else value
+                put(name, finalValue)
             }
         }
     }
