@@ -1,4 +1,4 @@
-package com.willwolfram18.extensions.kotlinlogging.com.willwolfram18.extensions.kotlinlogging
+package com.willwolfram18.extensions.kotlinlogging
 
 class RegexMessageTemplateParser : MessageTemplateParser {
     companion object {
