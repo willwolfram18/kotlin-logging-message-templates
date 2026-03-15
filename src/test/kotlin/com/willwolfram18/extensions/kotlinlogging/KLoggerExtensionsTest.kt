@@ -17,6 +17,16 @@ class KLoggerExtensionsTest {
         every { cause = captureNullable(causeCapture) } just Runs
     }
     private val eventBuilderSlot = slot<KLoggingEventBuilder.() -> Unit>()
+    private val mockParser = mockk<MessageTemplateParser> {
+        every { parseTemplateArguments(any(), any()) } returns mapOf(
+            "firstArg" to "arg"
+        )
+    }
+
+    @BeforeEach
+    fun configureParser() {
+        parser = mockParser
+    }
 
     @Test
     fun `debugTemplate without throwable should call atDebug with correct parameters`() {
