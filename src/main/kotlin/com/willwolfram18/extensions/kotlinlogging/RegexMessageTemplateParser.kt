@@ -1,8 +1,6 @@
 package com.willwolfram18.extensions.kotlinlogging
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.willwolfram18.extensions.kotlinlogging.RegexMessageTemplateParser.Companion.objectMapper
+import com.fasterxml.jackson.module.kotlin.*
 
 class RegexMessageTemplateParser : MessageTemplateParser {
     companion object {
