@@ -33,14 +33,14 @@ abstract class MessageTemplateParserTestBase {
         ],
         delimiter = '|'
     )
-    fun `GIVEN opening curly without closing curly WHEN parsing THEN empty map is returned`(
+    fun `GIVEN opening curly without closing curly WHEN parsing THEN unclosed property is excluded`(
         messageTemplate: String,
         expectedPairs: String
     ) {
         // Act
         val result = parser.parseTemplateArguments(messageTemplate, 1, 2, 3)
 
-        // Assert
+        // Act: build the expected map from our delimited string
         val parsedPairs = when {
             expectedPairs.isEmpty() -> emptyList()
             else -> expectedPairs.split(";").map {
@@ -49,6 +49,37 @@ abstract class MessageTemplateParserTestBase {
             }
         }.toMap()
 
+        // Assert: verify the resulting property names
+        result shouldHaveSize parsedPairs.size
+        result shouldBe parsedPairs
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        value = [
+            "I am a message missing an open curly}|''",
+            "I have {oneProp} and another bad prop}|oneProp,1",
+            "I have {oneProp} and {twoProp} but not three}|oneProp,1;twoProp,2"
+        ],
+        delimiter = '|',
+    )
+    fun `GIVEN closing curly without an opening WHEN parsing THEN unopened property is excluded`(
+        messageTemplate: String,
+        expectedPairs: String
+    ) {
+        // Act
+        val result = parser.parseTemplateArguments(messageTemplate, 1, 2, 3)
+
+        // Act: build the expected map from our delimited string
+        val parsedPairs = when {
+            expectedPairs.isEmpty() -> emptyList()
+            else -> expectedPairs.split(";").map {
+                val (key, value) = it.split(",")
+                key to (value.toInt() as Any?)
+            }
+        }.toMap()
+
+        // Assert: verify the resulting property names
         result shouldHaveSize parsedPairs.size
         result shouldBe parsedPairs
     }
