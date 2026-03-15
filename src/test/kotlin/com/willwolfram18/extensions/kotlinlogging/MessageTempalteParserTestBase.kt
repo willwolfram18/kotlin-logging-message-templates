@@ -4,10 +4,13 @@ import com.willwolfram18.extensions.kotlinlogging.com.willwolfram18.extensions.k
 import io.kotest.matchers.collections.shouldNotContainAnyOf
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.maps.shouldContain
+import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.maps.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -27,6 +30,35 @@ abstract class MessageTempalteParserTestBase {
 
         // Assert
         result.shouldBeEmpty()
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        value = [
+            "I am a message with a malformed {property|''",
+            "I have {oneProp} and another bad {prop|oneProp,1",
+            "I have {oneProp} and {twoProp} but not {three|oneProp,1;twoProp,2"
+        ],
+        delimiter = '|'
+    )
+    fun `GIVEN opening curly without closing curly WHEN parsing THEN empty map is returned`(
+        messageTemplate: String,
+        expectedPairs: String
+    ) {
+        // Act
+        val result = parser.parseTemplateArguments(messageTemplate, 1, 2, 3)
+
+        // Assert
+        val parsedPairs = when {
+            expectedPairs.isEmpty() -> emptyList()
+            else -> expectedPairs.split(";").map {
+                val (key, value) = it.split(",")
+                key to (value as Any?)
+            }
+        }.groupBy { it.first }
+
+        result shouldHaveSize parsedPairs.size
+        result shouldBe parsedPairs
     }
 
     @Test
