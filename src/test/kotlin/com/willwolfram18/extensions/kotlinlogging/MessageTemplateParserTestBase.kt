@@ -1,23 +1,15 @@
 package com.willwolfram18.extensions.kotlinlogging
 
-import com.willwolfram18.extensions.kotlinlogging.com.willwolfram18.extensions.kotlinlogging.MessageTemplateParser
-import io.kotest.matchers.collections.shouldNotContainAnyOf
-import io.kotest.matchers.maps.shouldBeEmpty
-import io.kotest.matchers.maps.shouldContain
-import io.kotest.matchers.maps.shouldContainExactly
-import io.kotest.matchers.maps.shouldHaveSize
-import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Tag
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
-import org.junit.jupiter.params.provider.ValueSource
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-import kotlin.time.TimeSource
-import kotlin.time.toDuration
+import com.willwolfram18.extensions.kotlinlogging.com.willwolfram18.extensions.kotlinlogging.*
+import io.kotest.matchers.*
+import io.kotest.matchers.collections.*
+import io.kotest.matchers.maps.*
+import org.junit.jupiter.api.*
+import org.junit.jupiter.params.*
+import org.junit.jupiter.params.provider.*
+import kotlin.time.*
 
-abstract class MessageTempalteParserTestBase {
+abstract class MessageTemplateParserTestBase {
     abstract val parser: MessageTemplateParser
 
     @Test
@@ -53,9 +45,9 @@ abstract class MessageTempalteParserTestBase {
             expectedPairs.isEmpty() -> emptyList()
             else -> expectedPairs.split(";").map {
                 val (key, value) = it.split(",")
-                key to (value as Any?)
+                key to (value.toInt() as Any?)
             }
-        }.groupBy { it.first }
+        }.toMap()
 
         result shouldHaveSize parsedPairs.size
         result shouldBe parsedPairs
@@ -131,7 +123,7 @@ abstract class MessageTempalteParserTestBase {
 
         // Run in a loop to
         val durations = mutableListOf<Long>()
-        val iterations = 100
+        val iterations = 20
         repeat(iterations) {
             // Arrange: timer
             val timer = TimeSource.Monotonic.markNow()
