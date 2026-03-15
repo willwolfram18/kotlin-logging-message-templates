@@ -172,4 +172,63 @@ abstract class MessageTemplateParserTestBase {
 
         println("Over $iterations iterations, min duration=$minDuration, max duration=$maxDuration, avg duration=$avgDuration")
     }
+
+    @Test
+    fun `GIVEN stringify formatter with integer WHEN parsing THEN value is converted to string`() {
+        // Arrange
+        val template = "Value is {\$num}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, 42)
+
+        // Assert
+        result shouldHaveSize 1
+        result shouldContain ("num" to "42")
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+        booleans = [true, false]
+    )
+    fun `GIVEN stringify formatter with boolean WHEN parsing THEN value is converted to string`(
+        value: Boolean
+    ) {
+        // Arrange
+        val template = "Flag is {\$flag}"
+
+        // Act
+        val result = parser.parseTemplateArguments(template, value)
+
+        // Assert
+        result shouldHaveSize 1
+        result shouldContain ("flag" to value.toString())
+    }
+
+    @Test
+    fun `GIVEN stringify formatter with list WHEN parsing THEN value is converted to string`() {
+        // Arrange
+        val template = "List is {\$items}"
+        val list = listOf(1, 2, 3)
+
+        // Act
+        val result = parser.parseTemplateArguments(template, list)
+
+        // Assert
+        result shouldHaveSize 1
+        result shouldContain ("items" to "[1, 2, 3]")
+    }
+
+    @Test
+    fun `GIVEN stringify formatter with map WHEN parsing THEN value is converted to string`() {
+        // Arrange
+        val template = "Map is {\$data}"
+        val map = mapOf(1 to "hello", 2 to "world")
+
+        // Act
+        val result = parser.parseTemplateArguments(template, map)
+
+        // Assert
+        result shouldHaveSize 1
+        result shouldContain ("data" to "{1=hello, 2=world}")
+    }
 }
