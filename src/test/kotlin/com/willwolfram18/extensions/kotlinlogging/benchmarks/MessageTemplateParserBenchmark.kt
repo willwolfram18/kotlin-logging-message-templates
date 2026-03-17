@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations.State
 @Measurement(iterations = 10, time = 2)
 open class MessageTemplateParserBenchmark {
 
-    @Param("Regex", "CachedRegex", "StringIteration")
+    @Param("Regex", "CachedRegex", "StringIteration", "CachedStringIteration")
     var parserType: String = "Regex"
 
     private lateinit var parser: MessageTemplateParser
@@ -21,6 +21,7 @@ open class MessageTemplateParserBenchmark {
             "Regex" -> RegexMessageTemplateParser()
             "CachedRegex" -> CachedRegexMessageTemplateParser()
             "StringIteration" -> StringIterationTemplateParser()
+            "CachedStringIteration" -> CachedStringIterationTemplateParser()
             else -> throw IllegalArgumentException("Unknown parser type: $parserType")
         }
     }
