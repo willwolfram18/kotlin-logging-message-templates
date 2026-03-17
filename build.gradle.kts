@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "2.3.0"
+    id("org.jetbrains.kotlinx.benchmark") version "0.4.13"
+//    kotlin("benchmark") version "0.4.13"
 }
 
 group = "com.willwolfram18.extensions.kotlinlogging"
@@ -16,6 +18,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
 
+
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-assertions-core:6.0.5")
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -26,6 +29,19 @@ dependencies {
 
 kotlin {
     jvmToolchain(25)
+    sourceSets {
+        test {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.13")
+            }
+        }
+    }
+}
+
+benchmark {
+    targets {
+        register("test")
+    }
 }
 
 tasks.test {
