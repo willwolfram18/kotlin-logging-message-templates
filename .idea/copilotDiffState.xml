@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="/build.gradle (snapshot).kts">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="/build.gradle (snapshot).kts" />
+              <option name="originalContent" value="plugins {&#10;    kotlin(&quot;jvm&quot;) version &quot;2.3.0&quot;&#10;    id(&quot;org.jetbrains.kotlinx.benchmark&quot;) version &quot;0.4.11&quot;&#10;}&#10;&#10;group = &quot;com.willwolfram18.extensions.kotlinlogging&quot;&#10;version = &quot;1.0-SNAPSHOT&quot;&#10;&#10;repositories {&#10;    mavenCentral()&#10;}&#10;&#10;dependencies {&#10;    val jacksonVersion = &quot;2.15.2&quot;&#10;&#10;    implementation(&quot;io.github.oshai:kotlin-logging-jvm:7.0.3&quot;)&#10;    implementation(&quot;com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion&quot;)&#10;    implementation(&quot;com.fasterxml.jackson.core:jackson-databind:$jacksonVersion&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.11&quot;)&#10;&#10;    testImplementation(kotlin(&quot;test&quot;))&#10;    testImplementation(&quot;io.kotest:kotest-assertions-core:6.0.5&quot;)&#10;    testImplementation(&quot;org.junit.jupiter:junit-jupiter&quot;)&#10;    testImplementation(&quot;io.mockk:mockk:1.13.10&quot;)&#10;    testImplementation(&quot;net.bytebuddy:byte-buddy:1.17.5&quot;)&#10;    testImplementation(&quot;org.slf4j:slf4j-simple:2.0.3&quot;)&#10;}&#10;&#10;kotlin {&#10;    jvmToolchain(25)&#10;}&#10;&#10;tasks.test {&#10;    useJUnitPlatform()&#10;    jvmArgs = jvmArgs + &quot;-Dnet.bytebuddy.experimental=true&quot;&#10;}" />
+              <option name="updatedContent" value="plugins {&#10;    kotlin(&quot;jvm&quot;) version &quot;2.3.0&quot;&#10;    id(&quot;org.jetbrains.kotlinx.benchmark&quot;) version &quot;0.4.11&quot;&#10;}&#10;&#10;group = &quot;com.willwolfram18.extensions.kotlinlogging&quot;&#10;version = &quot;1.0-SNAPSHOT&quot;&#10;&#10;repositories {&#10;    mavenCentral()&#10;}&#10;&#10;dependencies {&#10;    val jacksonVersion = &quot;2.15.2&quot;&#10;&#10;    implementation(&quot;io.github.oshai:kotlin-logging-jvm:7.0.3&quot;)&#10;    implementation(&quot;com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion&quot;)&#10;    implementation(&quot;com.fasterxml.jackson.core:jackson-databind:$jacksonVersion&quot;)&#10;    implementation(&quot;org.jetbrains.kotlinx:kotlinx-benchmark-runtime:0.4.11&quot;)&#10;&#10;    testImplementation(kotlin(&quot;test&quot;))&#10;    testImplementation(&quot;io.kotest:kotest-assertions-core:6.0.5&quot;)&#10;    testImplementation(&quot;org.junit.jupiter:junit-jupiter&quot;)&#10;    testImplementation(&quot;io.mockk:mockk:1.13.10&quot;)&#10;    testImplementation(&quot;net.bytebuddy:byte-buddy:1.17.5&quot;)&#10;    testImplementation(&quot;org.slf4j:slf4j-simple:2.0.3&quot;)&#10;}&#10;&#10;kotlin {&#10;    jvmToolchain(25)&#10;    sourceSets {&#10;        val benchmark by creating {&#10;            kotlin.srcDir(&quot;src/benchmark/kotlin&quot;)&#10;            resources.srcDir(&quot;src/benchmark/resources&quot;)&#10;            compileClasspath += sourceSets[&quot;main&quot;].output&#10;            runtimeClasspath += sourceSets[&quot;main&quot;].output&#10;        }&#10;    }&#10;}&#10;&#10;tasks.test {&#10;    useJUnitPlatform()&#10;    jvmArgs = jvmArgs + &quot;-Dnet.bytebuddy.experimental=true&quot;&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

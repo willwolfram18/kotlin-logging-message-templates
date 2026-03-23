@@ -27,12 +27,6 @@ open class MessageTemplateParserBenchmark {
     }
 
     @Benchmark
-    fun benchmarkParseTemplateArguments1(): Map<String, Any?> {
-        val template = "Argument {arg1}"
-        return parser.parseTemplateArguments(template, 1)
-    }
-
-    @Benchmark
     fun benchmarkParseTemplateArguments3(): Map<String, Any?> {
         val template = "Argument {arg1}; Argument {arg2}; Argument {arg3}"
         return parser.parseTemplateArguments(template, 1, 2, 3)
@@ -45,31 +39,7 @@ open class MessageTemplateParserBenchmark {
     }
 
     @Benchmark
-    fun benchmarkParseTemplateArguments10(): Map<String, Any?> {
-        val template = (1..10).joinToString("; ") { "Argument {arg$it}" }
-        return parser.parseTemplateArguments(template, *(1..10).toList().toTypedArray())
-    }
-
-    @Benchmark
-    fun benchmarkParseTemplateArguments100(): Map<String, Any?> {
-        val template = (1..100).joinToString("; ") { "Argument {arg$it}" }
-        return parser.parseTemplateArguments(template, *(1..100).toList().toTypedArray())
-    }
-
-    @Benchmark
     fun benchmarkParseTemplateArguments1000(): Map<String, Any?> {
-        val template = (1..1000).joinToString("; ") { "Argument {arg$it}" }
-        return parser.parseTemplateArguments(template, *(1..1000).toList().toTypedArray())
-    }
-
-    @Benchmark
-    fun benchmarkMemoryUsage100(): Map<String, Any?> {
-        val template = (1..100).joinToString("; ") { "Argument {arg$it}" }
-        return parser.parseTemplateArguments(template, *(1..100).toList().toTypedArray())
-    }
-
-    @Benchmark
-    fun benchmarkMemoryUsage1000(): Map<String, Any?> {
         val template = (1..1000).joinToString("; ") { "Argument {arg$it}" }
         return parser.parseTemplateArguments(template, *(1..1000).toList().toTypedArray())
     }
